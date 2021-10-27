@@ -1,0 +1,606 @@
+TITLE My First Program (Test.asm)
+INCLUDE Irvine32.inc
+
+
+.data
+
+filehandle DWORD ?
+buffsize=30
+
+filename BYTE "filename.txt", 0
+;buffer byte buffsize dup (?)
+i dword 0
+temp dword 1
+buffer byte 100 dup(?)
+output byte 100 dup(?)
+input byte 100 dup(?)
+temparr byte ?
+cll byte 0
+funcvar byte 0
+checker byte ";",0
+str2 byte "mov edx,offset str1",0
+str3 byte "call writestring",0
+str4 byte"call readint",0
+str5 byte"mov eax,",0
+first byte ?
+firsttwo byte ?
+ff byte ?
+ses byte ?
+second byte ?
+secondtwo byte ?
+minus byte ?
+lops byte "mov ecx,",0
+while1 byte "cmp x,",0
+while2 byte "je while",0
+while3 byte "jmp endd",0
+while4 byte "while:",0
+while5 byte "jl while",0
+while6 byte "jg  while",0
+while7 byte "jle while",0
+while8 byte "jge while",0
+whileval byte ?
+iff1 byte "je if",0
+iff2 byte "jl if",0
+iff3 byte "jle if",0
+iff4 byte "jg if",0
+iff5 byte "jge if",0
+ifval byte ?
+iff6 byte "if:",0
+funcvar2 byte 0
+functype byte 6 dup(?)
+functype2 byte 6 dup(?)
+funcarr byte 20 dup(?)
+inttype byte "int",0
+doublefunc byte "doube",0
+chartype byte "char",0
+floatfunc byte "float",0
+dwordtype byte " :dword ",0
+bytetype byte " :byte ",0
+funcproc byte " Proc,",0
+firstfunc byte ?
+preserve dword ?
+loplabel byte "L1:",0
+loploop byte "loop L1",0
+
+
+
+.code
+main PROC
+
+mov edx,OFFSET filename
+call OpenInputFile
+mov filehandle, EAX
+mov ebx,0
+mov esi,0
+K1:                                  
+mov ecx,temp                         ; specify how many bytes to read
+
+mov eax, filehandle                  ; assuming filehandle contains handle of an open file
+mov edx, OFFSET temparr              ; buffer will contain the text read from the file   
+call ReadFromFile
+
+mov bl,temparr
+mov buffer[esi*type buffer],bl                   
+inc esi 
+cmp eax,0                         
+jne K1            
+call crlf                            
+
+
+
+mov esi,0
+L1:
+mov bl,buffer[esi*type buffer]
+cmp bl,'c'
+je p1
+cmp bl,'f'
+je looop
+cmp bl,'w'
+je whilee
+cmp bl,'i'
+je iff
+cmp bl,'v'
+jmp func
+jmp last
+
+					p1:
+						inc esi
+						mov bl,buffer[esi*type buffer]
+						cmp bl,'o'
+						je print
+						cmp bl,'i'
+						je readd	
+						jmp last
+											print:
+													add esi,6
+													mov edi,0
+													L3:
+														mov bl,buffer[esi]
+														mov output[edi],bl
+														inc esi
+														inc edi
+														mov bl,buffer[esi]
+													
+														cmp bl,checker
+														je outt
+														jmp L3
+														jmp L1
+
+		
+																					readd:
+																							add esi,4
+																							mov edi,0
+																							L4:
+																							mov bl,buffer[esi]
+																							mov input[edi],bl
+																							inc esi
+																							inc edi
+																							mov bl,buffer[esi]
+																							cmp bl,checker
+																							je inn
+																							jmp L4
+																							jmp L1
+
+																													looop:
+																															inc esi
+																															mov bl,buffer[esi*type buffer]
+																															cmp bl,'o'
+																															je lop
+																															jmp last	
+lop:
+	add esi,5
+	mov eax,0
+	sub buffer[esi*type buffer],48
+	mov bl,buffer[esi*type buffer]
+	mov first,bl
+	inc esi
+	cmp buffer[esi*type buffer],';'
+	jne LL1
+	inccll:
+	inc cll
+	L2:
+	add esi,3
+	cmp buffer[esi*type buffer],'='
+	je lopequal
+	sub buffer[esi*type buffer],48
+	mov bl,buffer[esi*type buffer]
+	inc esi
+	cmp buffer[esi*type buffer],';'
+	jne LL4
+	mov second,bl
+	mov al,second
+	cmp bl,ff
+	jl  movzero
+	sub al,first
+	mov minus,al
+	movzx ecx,al
+	jmp printloop
+jmp last
+movzero:
+		mov minus,0
+		jmp printloop
+	jmp last
+														LL4:
+														    mov second,bl
+															sub buffer[esi*type buffer],48
+															mov bl,buffer[esi*type buffer]
+															mov secondtwo,bl
+															mov al,second
+															mov bl,10
+															mul bl
+															add al,secondtwo
+															mov ses,al
+															mov al,ses
+															cmp cll,1
+															je clll
+															sub al,ff
+															mov minus,al
+															movzx ecx,al
+														    jmp printloop
+																clll:
+																	sub al,first
+																	
+																	mov minus,al
+																	movzx ecx,al
+																	jmp printloop
+																	
+																	   
+	LL1:
+		sub buffer[esi*type buffer],48
+		mov bl,buffer[esi*type buffer]
+		mov firsttwo,bl
+		mov al,first
+		mov bl,10
+		mul bl
+		add al,firsttwo
+		mov ff,al
+		inc esi
+		jmp L2
+						lopequal:
+									inc esi
+									sub buffer[esi*type buffer],48
+									mov bl,buffer[esi*type buffer]
+									mov second,bl
+									inc esi
+									cmp buffer[esi*type buffer],';'
+									jne LL3
+									mov al,second
+									sub al,first
+									inc al
+									mov minus,al
+									;movzx ecx,al
+									jmp printloop
+
+													LL3:
+														sub buffer[esi*type buffer],48
+														mov bl,buffer[esi*type buffer]
+														mov secondtwo,bl
+														mov al,second
+														mov bl,10
+														mul bl
+														add al,secondtwo
+														mov ses,al
+														mov al,ses
+														sub al,ff
+														inc al
+														mov minus,al
+														movzx ecx,al
+													printloop:
+																mov edx,offset lops
+																call writestring
+																mov al,minus
+																call writedec
+																call crlf
+																mov edx,offset loplabel
+																call writestring
+																add esi,11
+																jmp L1
+whilee:
+inc esi
+mov bl,buffer[esi*type buffer]
+cmp bl,'h'
+je whi
+jmp last
+
+			whi:
+				add esi,6
+				mov bl,buffer[esi*type buffer]
+				cmp bl,'='
+				je whileequ
+				cmp bl,'<'
+				je whileless
+				cmp bl,'>'
+				je whilegreater
+				jmp last
+								
+								whileequ:
+										inc esi
+										sub buffer[esi*type buffer],48
+										mov al,buffer[esi*type buffer]
+										mov whileval,al
+										mov edx,offset while1
+										call writestring
+										call writedec
+										call crlf
+										mov edx,offset while2
+										call writestring
+										call crlf
+										mov edx,offset while3
+										call writestring
+										call crlf
+										mov edx,offset while4
+										call writestring
+										call crlf
+										add esi,7
+										jmp L1
+												whileless:
+														inc esi
+														mov bl, buffer[esi*type buffer]
+														cmp bl,'='
+														je whilelessequ
+														sub buffer[esi*type buffer],48
+														mov al,buffer[esi*type buffer]
+														mov whileval,al
+														mov edx,offset while1
+														call writestring
+														call writedec
+														call crlf
+														mov edx,offset while5
+														call writestring
+														call crlf
+														mov edx,offset while3
+														call writestring
+														call crlf
+														mov edx,offset while4
+														call writestring
+														call crlf
+														add esi,7
+														jmp L1
+																whilegreater:
+																		inc esi
+																		mov bl, buffer[esi*type buffer]
+																		cmp bl,'='
+																		je whilelegreaterequ
+																		sub buffer[esi*type buffer],48
+																		mov al,buffer[esi*type buffer]
+																		mov whileval,al
+																		mov edx,offset while1
+																		call writestring
+																		call writedec
+																		call crlf
+																		mov edx,offset while6
+																		call writestring
+																		call crlf
+																		mov edx,offset while3
+																		call writestring
+																		call crlf
+																		mov edx,offset while4
+																		call writestring
+																		call crlf
+																		add esi,7
+																		jmp L1
+																					whilelessequ:
+																							inc esi
+																							sub buffer[esi*type buffer],48
+																							mov al,buffer[esi*type buffer]
+																							mov whileval,al
+																							mov edx,offset while1
+																							call writestring
+																							call writedec
+																							call crlf
+																							mov edx,offset while7
+																							call writestring
+																							call crlf
+																							mov edx,offset while3
+																							call writestring
+																							call crlf
+																							mov edx,offset while4
+																							call writestring
+																							call crlf
+																							add esi,7
+																							jmp L1
+																										whilelegreaterequ:
+																												inc esi
+																												sub buffer[esi*type buffer],48
+																												mov al,buffer[esi*type buffer]
+																												mov whileval,al
+																												mov edx,offset while1
+																												call writestring
+																												call writedec
+																												call crlf
+																												mov edx,offset while8
+																												call writestring
+																												call crlf
+																												mov edx,offset while3
+																												call writestring
+																												call crlf
+																												mov edx,offset while4
+																												call writestring
+																												call crlf
+																												add esi,7
+																												jmp L1
+iff:
+mov preserve,esi
+inc esi
+mov bl,buffer[esi*type buffer]
+cmp bl,'f'
+je ifff
+mov esi,preserve
+jmp L1
+		ifff:
+				add esi,3
+				mov bl,buffer[esi*type buffer]
+				cmp bl,'='
+				je ifequ
+				cmp bl,'<'
+				je ifless
+				cmp bl,'>'
+				je ifgreater
+				jmp last
+								
+								ifequ:
+										inc esi
+										sub buffer[esi*type buffer],48
+										mov al,buffer[esi*type buffer]
+										mov ifval,al
+										mov edx,offset while1
+										call writestring
+										call writedec
+										call crlf
+										mov edx,offset iff1
+										call writestring
+										call crlf
+										mov edx,offset while3
+										call writestring
+										call crlf
+										mov edx,offset iff6
+										call writestring
+										call crlf
+										add esi,7
+										jmp L1	
+												ifless:
+														inc esi
+														mov bl, buffer[esi*type buffer]
+														cmp bl,'='
+														je iflessequ
+														sub buffer[esi*type buffer],48
+														mov al,buffer[esi*type buffer]
+														mov ifval,al
+														mov edx,offset while1
+														call writestring
+														call writedec
+														call crlf
+														mov edx,offset iff2
+														call writestring
+														call crlf
+														mov edx,offset while3
+														call writestring
+														call crlf
+														mov edx,offset iff6
+														call writestring
+														call crlf
+														add esi,7
+														jmp L1
+																ifgreater:
+																		inc esi
+																		mov bl, buffer[esi*type buffer]
+																		cmp bl,'='
+																		je ifgreaterequ
+																		sub buffer[esi*type buffer],48
+																		mov al,buffer[esi*type buffer]
+																		mov ifval,al
+																		mov edx,offset while1
+																		call writestring
+																		call writedec
+																		call crlf
+																		mov edx,offset iff4
+																		call writestring
+																		call crlf
+																		mov edx,offset while3
+																		call writestring
+																		call crlf
+																		mov edx,offset iff6
+																		call writestring
+																		call crlf
+																		add esi,7
+																		jmp L1
+																					iflessequ:
+																							inc esi
+																							sub buffer[esi*type buffer],48
+																							mov al,buffer[esi*type buffer]
+																							mov ifval,al
+																							mov edx,offset while1
+																							call writestring
+																							call writedec
+																							call crlf
+																							mov edx,offset iff3
+																							call writestring
+																							call crlf
+																							mov edx,offset while3
+																							call writestring
+																							call crlf
+																							mov edx,offset iff6
+																							call writestring
+																							call crlf
+																							add esi,7
+																							jmp L1
+																										ifgreaterequ:
+																												inc esi
+																												sub buffer[esi*type buffer],48
+																												mov al,buffer[esi*type buffer]
+																												mov ifval,al
+																												mov edx,offset while1
+																												call writestring
+																												call writedec
+																												call crlf
+																												mov edx,offset iff5
+																												call writestring
+																												call crlf
+																												mov edx,offset while3
+																												call writestring
+																												call crlf
+																												mov edx,offset iff6
+																												call writestring
+																												call crlf
+																												add esi,7
+																												jmp L1				
+func:
+		mov edi,0
+		mov bl,buffer[esi*type buffer]
+		cmp bl,' '
+		je found
+		inc esi											
+		jmp func
+						found:
+							
+							inc esi
+							mov bl,buffer[esi*type buffer]
+							cmp bl,'('
+							je next
+							mov funcarr[edi*type funcarr],bl
+							inc edi
+							jmp found
+jmp last
+									next:
+									mov edi,0
+									nextt:
+											inc esi
+											mov bl,buffer[esi*type buffer]
+											mov functype[edi*type functype],bl
+											inc edi
+											cmp bl,' '
+											je found2										
+											jmp nextt
+													found2:
+														inc esi
+														mov bl,buffer[esi*type buffer]
+														mov firstfunc,bl
+														inc esi
+														mov bl,buffer[esi*type buffer]
+														cmp bl,')'
+														je printfunc1
+														;save2:
+															;inc esi
+															;mov bl,buffer[esi*type buffer]
+															;mov functype2[funcvar2* type functype2],bl
+															;inc funcvar2
+															;cmp bl,')'
+															;je printfunc
+															;jmp save2
+																			printfunc1:
+																				mov edx,offset funcarr
+																				call writestring
+																				mov edx,offset funcproc
+																				call writestring
+																				mov al,firstfunc
+																				call writechar
+																				mov preserve,esi
+																				mov bl,functype[0]
+																				cmp bl,'i'
+																				je printint
+																				cmp bl,'c'
+																				je printchar											
+																				jmp last
+																							printint:
+																								mov edx,offset dwordtype
+																								call writestring
+																								jmp last
+																									printchar:
+																										mov edx,offset bytetype
+																										call writestring
+																										jmp last
+																					
+inn:
+call crlf
+mov edx,offset str4
+call writestring
+call crlf
+mov edx,offset str5
+call writestring
+mov edx,offset input
+call writestring
+call crlf
+call crlf
+add esi,3
+jmp L1
+
+outt:
+call crlf
+mov edx,offset str2
+call writestring
+call crlf
+mov edx,offset str3
+call writestring
+call crlf   
+call crlf 
+mov edx,offset output
+call writestring
+call crlf
+add esi,3
+jmp L1
+last:
+		
+endd:
+exit
+main ENDP
+END main
